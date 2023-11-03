@@ -11,9 +11,9 @@ async function main() {
 	const successorMeta = await successorMetaResponse.json() as typeof meta;
 
 	if (meta.version >= successorMeta.version) {
-		startMain();
+		await startMain();
 	} else {
-		updatePayload(successorMeta);
+		await updatePayload(successorMeta);
 	}
 }
 
@@ -34,7 +34,7 @@ async function updatePayload(successorMeta: typeof meta) {
 	const successorURL = path.join(siteURL, "./devicePayload.zip");
 	const successorResponse = await resilientFetch(successorURL);
 	const successorArray = new Uint8Array(await successorResponse.arrayBuffer());
-	Deno.writeFile("../devicePayload.zip", successorArray, { create: true });
+	Deno.writeFile("../newDevicePayload.zip", successorArray, { create: true });
 
 	// replace self and start new
 	const succeed = new Deno.Command("bash", {
