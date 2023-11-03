@@ -5,21 +5,27 @@ import meta from "./meta.json" assert { type: "json" };
 const siteURL = "https://wrens-room-lights-2.web.app";
 
 async function main() {
+	try {
+		await checkForUpdates();
+		console.log(`Payload v${meta.version} is up to date`);
+	} catch (_) {
+		console.log("Failed to check for updates");
+	}
+	startMain();
+}
+
+async function checkForUpdates() {
 	// check versions
 	const successorMetaURL = path.join(siteURL, "./devicePayload/meta.json");
 	const successorMetaResponse = await resilientFetch(successorMetaURL);
 	const successorMeta = await successorMetaResponse.json() as typeof meta;
 
-	if (meta.version >= successorMeta.version) {
-		await startMain();
-	} else {
+	if (meta.version < successorMeta.version) {
 		await updatePayload(successorMeta);
 	}
 }
 
 async function startMain() {
-	console.log(`Payload v${meta.version} is up to date`);
-
 	// open main
 	const succeed = new Deno.Command("bash", {
 		args: ["./startMain.sh"]
@@ -41,6 +47,7 @@ async function updatePayload(successorMeta: typeof meta) {
 		args: ["./succeed.sh", path.basename(Deno.cwd())]
 	});
 	await succeed.output();
+	Deno.exit(0);
 }
 
 async function resilientFetch(input: string | URL | Request, init?: RequestInit, tries = 5) {
