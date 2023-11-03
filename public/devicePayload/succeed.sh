@@ -1,7 +1,7 @@
 #!/bin/bash
 cd ..
-unzip devicePayload.zip -q -d ../devicePayload
-rm devicePayload.zip
-rm -r $1
+sudo unzip devicePayload.zip -d devicePayload
+rm -f devicePayload.zip
+rm -r -f $1
 mv devicePayload $1
 bash $1/start.sh
